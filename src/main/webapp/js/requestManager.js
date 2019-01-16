@@ -1,0 +1,7 @@
+Class RequestManager {
+    constructor(){};
+
+    parse() {
+
+    }
+}

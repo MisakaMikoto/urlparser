@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>INDEX</title>
+    <script type="text/javascript" src="/js/requestPromise.js"></script>
+
+    <script type="text/javascript">
+        function go() {
+            let url = "http://localhost:8080/index";
+            let type = "html";
+
+            let requestPromise = new RequestPromise();
+            return requestPromise.get('/parse?url=' + url + '&type=' + type + '&dividingNumber=' + 10)
+                .then((response) => {
+                    console.log(response);
+            }, function(error) {
+                console.error('Failed!', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div id="container">
+        <div>
+            <span> URL: </span>
+            <input type="text" id="url" />
+        </div>
+
+        <div>
+            <span> TYPE : </span>
+            <select id="type">
+                <option value="text"> TEXT </option>
+                <option value="html"> HTML </option>
+            </select>
+        </div>
+
+        <div>
+            <span> 출력 묶음 단위 (자연수) </span>
+            <input type="number" min="0" max="100">
+        </div>
+
+        <div>
+            <button id="go" onclick="go()"> 출력 </button>
+        </div>
+
+        <div>
+            <span> 몫 : <span id="quotient"></span></span>
+        </div>
+
+        <div>
+            <span> 나머지 : <span id="remainder"></span></span>
+        </div>
+    </div>
+</body>
+</html>
