@@ -6,17 +6,58 @@
     <script type="text/javascript" src="/js/requestPromise.js"></script>
 
     <script type="text/javascript">
-        function go() {
-            let url = "http://localhost:8080/index";
-            let type = "html";
+        function validate() {
+            let urlValue = document.getElementById('url').value;
+            let dividingNumberValue = document.getElementById('dividingNumber').value;
 
-            let requestPromise = new RequestPromise();
-            return requestPromise.get('/parse?url=' + url + '&type=' + type + '&dividingNumber=' + 10)
-                .then((response) => {
-                    console.log(response);
-            }, function(error) {
-                console.error('Failed!', error);
-            });
+            if(urlValue != "" && dividingNumberValue != "") {
+                return true;
+
+            } else {
+                return false;
+            }
+        }
+
+        function validateURL() {
+            let urlValue = document.getElementById('url').value;
+
+            if(urlValue.includes('http://') || urlValue.includes('https://')) {
+                return true;
+
+            } else {
+                return false;
+            }
+        }
+
+        function go() {
+            if(validate()) {
+                if(validateURL()) {
+                    let url = document.getElementById('url').value;
+                    let type = document.getElementById('type').value;
+                    let dividingNumber = document.getElementById('dividingNumber').value;
+
+                    let requestPromise = new RequestPromise();
+                    return requestPromise.get('/parse?url=' + url + '&type=' + type + '&dividingNumber=' + dividingNumber)
+                        .then((response) => {
+                            let responseObject = JSON.parse(response);
+                            if (responseObject.result) {
+                                document.getElementById('quotient').innerText = responseObject.quotient;
+                                document.getElementById('remainder').innerText = responseObject.remainder;
+
+                            } else {
+                                alert('잘못된 HTML 형식을 가진 페이지 입니다.')
+                            }
+
+                        }, function (error) {
+                            console.error('Failed!', error);
+                        });
+                } else {
+                    alert('URL 에서 프로토콜 입력은 필수 입니다. (http://, https://)');
+                }
+
+            } else {
+                alert('URL 과 출력 묶음 단위(자연수) 영역은 필수로 입력하셔야 합니다.');
+            }
         }
     </script>
 </head>
@@ -37,7 +78,7 @@
 
         <div>
             <span> 출력 묶음 단위 (자연수) </span>
-            <input type="number" min="0" max="100">
+            <input type="number" id="dividingNumber" min="0" max="100" />
         </div>
 
         <div>

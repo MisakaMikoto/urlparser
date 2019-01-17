@@ -23,15 +23,17 @@ public class ParserService {
 
     public static final String A_TO_Z = "[A-Za-z]";
     public static final String ZERO_TO_NINE = "[0-9]";
+    public static final String FIND_TAG = "<[^>]*>";
+
+    public static final String HTML_TAG_START = "<html";
+    public static final String HTML_TAG_END = "/html>";
+
 
     public Response getResponseText(String url, String type, int dividingNumber) throws IOException {
-        //http://localhost:8081/cc
-        //https://comic.naver.com/webtoon/detail.nhn?titleId=183559&no=418&weekday=mon
-//        Document doc = Jsoup.connect("http://localhost:8081/cc").get().normalise();
-
-
         // rest call and get response text
         String responseText = restHttpGet.call(url);
+
+        // is verification html?
         boolean isVerification = this.isVerificationResponseText(responseText);
 
         return isVerification ?
@@ -40,30 +42,41 @@ public class ParserService {
 
     private boolean isVerificationResponseText(String responseText) {
         Stack<String> verificationStack = new Stack<>();
-        char[] charArray = responseText.toCharArray();
 
-        for(int i = 0; i < charArray.length; i++) {
-            if(charArray[i] == '<') {
-                verificationStack.push("v");
+        // check html
+        boolean isCorrectHtmlText = this.isCorrectHtmlText(responseText);
+
+        if(isCorrectHtmlText) {
+            Matcher m = this.createMatcher(FIND_TAG, responseText);
+            while (m.find()) {
+                char[] charArray = m.group().toCharArray();
+
+                if (charArray[0] == '<') {
+                    verificationStack.push("open");
+                }
+
+                if (charArray[charArray.length - 1] == '>') {
+                    verificationStack.pop();
+                }
             }
-            if(charArray[i] == '>') {
-                verificationStack.pop();
-            }
+            return verificationStack.isEmpty();
+
+        } else {
+            return false;
         }
-        return verificationStack.isEmpty();
     }
 
-    private String createCleanText(String responseText, String type) {
+    public String createCleanText(String responseText, String type) {
         Whitelist whitelist = Whitelist.none();
         return type.equals("html") ? Jsoup.clean(responseText, whitelist) : responseText;
     }
 
-    private Matcher createMatcher(String regex, String responseText) {
+    public Matcher createMatcher(String regex, String responseText) {
         Pattern pattern = Pattern.compile(regex);
         return pattern.matcher(responseText);
     }
 
-    private LinkedList createAscList(Matcher m) {
+    public LinkedList createAscList(Matcher m) {
         LinkedList<String> ascList = new LinkedList<>();
         while (m.find()) {
             ascList.add(m.group());
@@ -75,7 +88,10 @@ public class ParserService {
     private String[] mergeAscList(LinkedList<String> alphabetAscList, LinkedList<String> numberAscList) {
         String[] arr = new String[alphabetAscList.size() + numberAscList.size()];
 
+        // loop alphabet + number length
         for (int i = 0; i < arr.length; i++) {
+
+            // number setting
             if (i % 2 > 0) {
                 if (!numberAscList.isEmpty()) {
                     arr[i] = numberAscList.pop();
@@ -84,6 +100,7 @@ public class ParserService {
                     arr[i] = alphabetAscList.pop();
                 }
 
+            // alphabet s etting
             } else {
                 if (!alphabetAscList.isEmpty()) {
                     arr[i] = alphabetAscList.pop();
@@ -116,8 +133,10 @@ public class ParserService {
 
     private Response divideParseResponseTextToResult(String[] parseResponseText, int dividingNumber) {
         int quotient = parseResponseText.length / dividingNumber;
-        String quotientStr = Arrays.toString(parseResponseText).substring(0, (quotient * dividingNumber));
-        String remainderStr = Arrays.toString(parseResponseText).substring(quotient * dividingNumber, parseResponseText.length);
+
+        String str = String.join("", parseResponseText);
+        String quotientStr = str.substring(0, (quotient * dividingNumber));
+        String remainderStr = str.substring(quotient * dividingNumber, parseResponseText.length);
 
         Response response = new Response();
         response.setResult(true);
@@ -125,5 +144,14 @@ public class ParserService {
         response.setRemainder(remainderStr);
 
         return response;
+    }
+
+    private boolean isCorrectHtmlText(String responseText) {
+        if(responseText.indexOf(HTML_TAG_START) == -1 || responseText.indexOf(HTML_TAG_END) == -1) {
+            return false;
+
+        } else {
+            return true;
+        }
     }
 }

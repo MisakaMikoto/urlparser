@@ -19,7 +19,6 @@ public class ParserController {
     public Response parse(@RequestParam("url") String url,
                           @RequestParam("type") String type,
                           @RequestParam("dividingNumber") int dividingNumber) throws IOException {
-//        String surl = "https://comic.naver.com/webtoon/detail.nhn?titleId=183559&no=418&weekday=mon";
         return this.parserService.getResponseText(url, type, dividingNumber);
     }
 }
