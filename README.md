@@ -21,5 +21,7 @@
 - Used OpenSource in Frontend
   - nothing
   
-- issue : 현재 가장 밖의 <HTML></HTML> Tag 의 적합성 체크만 할 수 있다.
-          그 안에 여러 depth 를 거친 Tag 들의 적합성 체크는 되고 있지 않다.
+- 설명 : 
+  - 사이트 URL 을 입력하여 특정 String 을 파싱하는 것이 목표인 프로젝트
+  - 현재 가장 밖의 <HTML></HTML> Tag 의 적합성 체크만 할 수 있다.
+  - 그 안에 여러 depth 를 거친 Tag 들의 적합성 체크는 되고 있지 않다.
