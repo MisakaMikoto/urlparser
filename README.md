@@ -8,7 +8,7 @@
     - Chrome
 
 - Backend Spec
-  - springboot 2.1.2 release
+  - SpringBoot 2.1.2 release
   
 - Frontend Spec
   - HTML5
@@ -20,3 +20,6 @@
   
 - Used OpenSource in Frontend
   - nothing
+  
+- issue : 현재 가장 밖의 <HTML></HTML> Tag 의 적합성 체크만 할 수 있다.
+          그 안에 여러 depth 를 거친 Tag 들의 적합성 체크는 되고 있지 않다.
